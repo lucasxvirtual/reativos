@@ -1,0 +1,109 @@
+//EVENT_DRIVEN
+
+int btn1 = -1;
+int btn2 = -1;
+int btn1Estado = 0;
+int btn2Estado = 0;
+unsigned long tempo;
+
+void button_changed(int pin, int v);
+void timer_expired(void);
+
+void button_listen(int pin){
+  if(btn1 == -1){
+    btn1 = pin;
+    pinMode(btn1, INPUT);
+  }
+  else {
+    btn2 = pin;
+    pinMode(btn2, INPUT);
+  }
+}
+
+void timer_set(int ms){
+  tempo = millis()+ms;
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  init();
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  int estado;
+
+  if (tempo <= millis()){
+    timer_expired();
+  }
+
+  estado = digitalRead(btn1);
+  if (btn1Estado != estado){
+    btn1Estado = estado;
+    button_changed(btn1, btn1Estado);
+  }
+  estado = digitalRead(btn2);
+  if(btn2Estado != estado){
+    btn2Estado = estado;
+    button_changed(btn2, btn2Estado);
+  }
+}
+
+//HELLO WORLD COM EVENT DRIVEN
+
+#include "event_driven.c"
+
+void init(){
+  button_listen(1);
+  timer_set(0);
+  pinMode(13, OUTPUT);
+}
+
+void button_changed(int pin, int v){
+  digitalWrite(13, v);
+}
+
+
+
+//TAREFA 02 COM EVENT DRIVEN
+
+#include "event_driven.c"
+
+int led = LOW;
+unsigned long velocidade = 1000;
+unsigned long guarda1 = 0, guarda2 = 0;
+int apertado1 = 0; apertado2 = 0;
+
+void init(){
+  button_listen(1);
+  button_listen(2);
+  timer_set(velocidade);
+  pinMode(13, OUTPUT);
+}
+
+void button_changed(int pin, int v){
+  if(v == HIGH){
+    if(pin == 1){
+      velocidade+=200;
+      guarda1 = millis();
+      apertado1 = 1;
+    }
+    else {
+      velocidade-=200;
+      guarda2 = millis();
+      apertado2 = 1;
+    }
+  }
+  if (apertado1 ==  1 && apertado2 == 1){
+    if(abs(guarda1 - guarda2)<=500){
+      while(1);
+    }
+  }
+}
+
+void timer_expired(){
+  digitalWrite(13, led);
+  led = !led;
+  timer_set(velocidade);
+}
