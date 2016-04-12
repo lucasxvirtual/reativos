@@ -1,0 +1,33 @@
+const int LM35 = A0; // Define o pino que lera a saída do LM35
+float temperatura; // Variável que armazenará a temperatura medida
+unsigned long tempo = 0;
+ 
+//Função que será executada uma vez quando ligar ou resetar o Arduino
+void setup() {
+  Serial.begin(9600); // inicializa a comunicação serial
+  pinMode(1, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+}
+ 
+//Função que será executada continuamente
+void loop() {
+  temperatura = (float(analogRead(LM35))*5/(1023))/0.01;
+  now = millis();
+  if(now > tempo + 1000){
+    Serial.print("Temperatura: ");
+    Serial.println(temperatura);
+    tempo = now;
+  }
+  
+  if (temperatura > 20)
+    digitalWrite(1, HIGH);
+   else digitalWrite(1, LOW);
+   if (temperatura > 26)
+    digitalWrite(2, HIGH);
+   else digitalWrite(2, LOW);
+   if (temperatura > 30)
+    digitalWrite(3, HIGH);
+   else digitalWrite(3, LOW);
+  
+}
